@@ -1,2 +1,2 @@
 # site_generator
-Static site generator
+Guided project from Boot.dev for a static site generator
