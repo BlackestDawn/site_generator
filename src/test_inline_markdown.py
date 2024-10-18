@@ -1,13 +1,17 @@
 import unittest
 
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter
+from inline_markdown import (
+    split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
+)
 
 
 class TestInlineMarkdown(unittest.TestCase):
     def test_single_text(self):
         nodes = [TextNode("normal text", TextType.TEXT)]
-        self.assertEqual(split_nodes_delimiter(nodes, "*", TextType.ITALIC), [TextNode("normal text", TextType.TEXT)])
+        self.assertListEqual(split_nodes_delimiter(nodes, "*", TextType.ITALIC), [TextNode("normal text", TextType.TEXT)])
 
     def test_simple_italic(self):
         nodes = [TextNode("normal text *italic text* normal text", TextType.ITALIC)]
@@ -16,7 +20,7 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("italic text", TextType.ITALIC),
             TextNode(" normal text", TextType.TEXT),
         ]
-        self.assertEqual(split_nodes_delimiter(nodes, "*", TextType.ITALIC), expe_ret)
+        self.assertListEqual(split_nodes_delimiter(nodes, "*", TextType.ITALIC), expe_ret)
 
     def test_simple_bold(self):
         nodes = [TextNode("normal text **bold text** normal text", TextType.CODE)]
@@ -25,7 +29,7 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("bold text", TextType.BOLD),
             TextNode(" normal text", TextType.TEXT),
         ]
-        self.assertEqual(split_nodes_delimiter(nodes, "**", TextType.BOLD), expe_ret)
+        self.assertListEqual(split_nodes_delimiter(nodes, "**", TextType.BOLD), expe_ret)
 
     def test_simple_code(self):
         nodes = [TextNode("normal text `code text` normal text", TextType.CODE)]
@@ -34,7 +38,7 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("code text", TextType.CODE),
             TextNode(" normal text", TextType.TEXT),
         ]
-        self.assertEqual(split_nodes_delimiter(nodes, "`", TextType.CODE), expe_ret)
+        self.assertListEqual(split_nodes_delimiter(nodes, "`", TextType.CODE), expe_ret)
 
     def test_start_formatted(self):
         nodes = [TextNode("`code text` normal text", TextType.CODE)]
@@ -43,7 +47,7 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("code text", TextType.CODE),
             TextNode(" normal text", TextType.TEXT),
         ]
-        self.assertEqual(split_nodes_delimiter(nodes, "`", TextType.CODE), expe_ret)
+        self.assertListEqual(split_nodes_delimiter(nodes, "`", TextType.CODE), expe_ret)
 
     def test_end_formatted(self):
         nodes = [TextNode("normal text **bold text**", TextType.CODE)]
@@ -51,7 +55,7 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("normal text ", TextType.TEXT),
             TextNode("bold text", TextType.BOLD),
         ]
-        self.assertEqual(split_nodes_delimiter(nodes, "**", TextType.BOLD), expe_ret)
+        self.assertListEqual(split_nodes_delimiter(nodes, "**", TextType.BOLD), expe_ret)
 
     def test_multiple_nodes(self):
         nodes = [
@@ -70,7 +74,17 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("italic text", TextType.ITALIC),
             TextNode(" end text3", TextType.TEXT),
         ]
-        self.assertEqual(split_nodes_delimiter(nodes, "*", TextType.ITALIC), expe_ret)
+        self.assertListEqual(split_nodes_delimiter(nodes, "*", TextType.ITALIC), expe_ret)
+
+    def test_image_extraction(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        res_val = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+        self.assertListEqual(extract_markdown_images(text), res_val)
+
+    def test_link_extraction(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        res_val = [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
+        self.assertListEqual(extract_markdown_links(text), res_val)
 
 
 if __name__ == "__main__":

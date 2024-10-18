@@ -1,3 +1,4 @@
+import re
 from textnode import TextType, TextNode
 
 
@@ -31,3 +32,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             raise Exception("Invalid Markdown syntax: delimiter not closed")
 
     return out_lst
+
+
+def extract_markdown_images(text):
+    return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+
+def extract_markdown_links(text):
+    return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
