@@ -8,7 +8,6 @@ class NodeType(Enum):
 
 
 class TextType(Enum):
-    NORMAL = "normal"
     TEXT = "text"
     BOLD = "bold"
     ITALIC = "italic"

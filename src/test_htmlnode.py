@@ -77,7 +77,7 @@ class TestHTMLNode(unittest.TestCase):
         )
 
     def test_text_to_html_conv_normal(self):
-        node = text_node_to_html(TextNode("normal text", TextType.NORMAL))
+        node = text_node_to_html(TextNode("normal text", TextType.TEXT))
         self.assertEqual(node.to_html(), "normal text")
 
     def test_text_to_html_conv_bold(self):
