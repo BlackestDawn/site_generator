@@ -18,7 +18,6 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             continue
         new_nodes = []
         splits = node.text.split(delimiter)
-#       print(f"splitting: '{node.text}' into: {splits}")
         if len(splits) % 2 == 0:
             raise Exception("Invalid Markdown syntax: delimiter '{delimiter}' not closed")
         for i in range(len(splits)):
