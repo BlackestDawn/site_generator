@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 from pathlib import Path
 from block_markdown import markdown_to_html_node
@@ -7,13 +8,18 @@ from block_markdown import markdown_to_html_node
 last_slash = os.path.dirname(__file__).rfind("/")
 base_dir = __file__[:last_slash]
 static_dir = base_dir + "/static"
-public_dir = base_dir + "/public"
+public_dir = base_dir + "/docs"
 content_dir = base_dir + "/content"
 
 
 def main():
+    if len(sys.argv) == 1:
+        basepath = "/"
+    else:
+        basepath = sys.argv[1]
+
     copy_static_source()
-    generate_pages_recursive(content_dir, base_dir + "/template.html", public_dir)
+    generate_pages_recursive(content_dir, base_dir + "/template.html", public_dir, basepath)
 
 
 def copy_static_source():
@@ -30,7 +36,7 @@ def extract_title(markdown):
     raise ValueError("Title not found")
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, webpath):
     print(f"Generating page:\n\tsource: {from_path}\n\tdestination: {dest_path}\n\ttemplate: {template_path}")
 
     source_file = open(from_path, "r")
@@ -44,22 +50,23 @@ def generate_page(from_path, template_path, dest_path):
     title_content = extract_title(source_content)
     template_content = template_content.replace("{{ Title }}", title_content)
     template_content = template_content.replace("{{ Content }}", html_nodes.to_html())
+    template_content = template_content.replace("href=\"/", f"href=\"{webpath}")
+    template_content = template_content.replace("src=\"/", f"src=\"{webpath}")
 
     target_dir = os.path.dirname(dest_path)
-#    print(f"DEBUG:: dest dir: {target_dir}")
     Path(target_dir).mkdir(parents=True, exist_ok=True)
     target_file = open(dest_path, "w")
     target_file.write(template_content)
     target_file.close()
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, webpath):
     dir_contents = os.listdir(dir_path_content)
     for entry in dir_contents:
         if os.path.isdir(f"{dir_path_content}/{entry}"):
-            generate_pages_recursive(f"{dir_path_content}/{entry}", template_path, f"{dest_dir_path}/{entry}")
+            generate_pages_recursive(f"{dir_path_content}/{entry}", template_path, f"{dest_dir_path}/{entry}", webpath)
         if os.path.isfile(f"{dir_path_content}/{entry}") and entry.endswith(".md"):
-            generate_page(f"{dir_path_content}/{entry}", template_path, f"{dest_dir_path}/{entry.replace(".md", ".html")}")
+            generate_page(f"{dir_path_content}/{entry}", template_path, f"{dest_dir_path}/{entry.replace(".md", ".html")}", webpath)
 
 
 if __name__ == "__main__":
