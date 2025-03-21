@@ -46,7 +46,7 @@ def generate_page(from_path, template_path, dest_path):
     template_content = template_content.replace("{{ Content }}", html_nodes.to_html())
 
     target_dir = os.path.dirname(dest_path)
-    print(f"DEBUG:: dest dir: {target_dir}")
+#    print(f"DEBUG:: dest dir: {target_dir}")
     Path(target_dir).mkdir(parents=True, exist_ok=True)
     target_file = open(dest_path, "w")
     target_file.write(template_content)

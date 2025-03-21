@@ -28,9 +28,9 @@ def block_to_block_type(block):
         return BlockType.HEADING.value
     if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
         return BlockType.CODE.value
-    if block.startswith("> "):
+    if block.startswith(">"):
         for line in lines:
-            if not line.startswith("> "):
+            if not line.startswith(">"):
                 return BlockType.PARAGRAPH.value
         return BlockType.QUOTE.value
     if block.startswith("* "):
